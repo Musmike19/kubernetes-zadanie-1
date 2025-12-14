@@ -1,1 +1,134 @@
-# kubernetes-zadanie-1
+# Michał Muzyka 2.3 – Sprawozdanie Zadanie 1
+
+### Uruchamiam klaster z węzłem głównym i 3 węzłami roboczymi z pluginem CNI Calico i sterownikiem Docker. Dla każdego węzła przydzielana jest pamięć RAM 1900 MB i 2 CPU w celu zaoszczędzenia zasobów urządzenia.
+
+![alt text](images/image.png)
+
+
+
+
+### Wyświetlam utworzone węzły. Oznaczam jeden z węzłów etykietą zone=backend. Weryfikuję to.
+
+![alt text](images/image-1.png)
+
+
+
+
+### Tworzę pliki YAML dla przestrzeni nazw frontend i backend. Do plików dodaję etykietę, aby ułatwić oznaczenie przestrzeni nazw w namespaceSelectorze w NetworkPolicy.
+
+![alt text](images/image-2.png)
+
+
+### Tworzę plik YAML obiektu Deployment o nazwie frontend na bazie obrazu nginx z 3 replikami. Dodaję do pliku sekcję nodeAffinity, aby pody mogły być umieszczane na dowolnym węźle oprócz tego, na którym są pody backend i my-sql. Używam do tego etykiety zone=backend. Określam też minimalne (requests) i maksymalne (limits) zasoby CPU i pamięci, jakie kontener może użyć – 100 MiB i cpu=100m. Przy autoskalerze przy 10 podach nadal będzie wystarczająca ilość zasobów w przestrzeni frontend przy limicie określonym później przez ResourceQuota.
+
+![alt text](images/image-3.png)
+
+
+
+### Tworzę plik YAML obiektu Deployment o nazwie backend na bazie obrazu nginx z 1 repliką. Dodaję do pliku sekcję nodeAffnity, aby pody mogły znaleźć się na tym samym węźle co my-sql. Używam do tego etykiety zone=backend. Określam też minimalne (requests) i maksymalne (limits) zasoby CPU i pamięci, jakie kontener może użyć – 256 MiB i cpu=200m. Jest to konieczne z powodu dalszej konfiguracji ResourceQuota. Parametry zostały dobrane losowo, ale w zakresie ResourceQuota.
+
+![alt text](images/image-4.png)
+
+
+
+### Tworzę plik YAML poda o nazwie my-sql na bazie obrazu mysql ze zmienną środowiskową MYSQL_ROOT_PASSWORD=root z hasłem do bazy danych oraz etykietą app=my-sql, która przyda się później dla obiektu NetworkPolicy dotyczącego my-sql. Określam też minimalne (requests) i maksymalne (limits) zasoby CPU i pamięci, jakie kontener może użyć – 512 MiB i cpu=500m. Jest to konieczne z powodu dalszej konfiguracji ResourceQuota. Parametry zostały dobrane losowo, ale w zakresie ResourceQuota.
+
+![alt text](images/image-5.png)
+
+
+### Aplikuję pliki YAML przestrzeni nazw, deploymentów i poda.
+
+![alt text](images/image-6.png)
+
+
+### Weryfikuję dodane etykiety do przestrzeni nazw.
+
+![alt text](images/image-17.png)
+
+
+### Weryfikuję utworzone obiekty Deployment i pody. Wszystkie działają.
+
+![alt text](images/image-18.png)
+
+
+### Tworzę plik obiektu Service typu NodePort o nazwie frontend-svc dla Deploymentu frontend w przestrzeni nazw frontend. Usługa będzie na porcie 80.
+
+![alt text](images/image-7.png)
+
+
+
+### Tworzę plik obiektu Service typu ClusterIP o nazwie backend-svc dla Deploymentu backend w przestrzeni nazw backend. Usługa będzie na porcie 80.
+
+![alt text](images/image-8.png)
+
+
+
+
+### Tworzę plik obiektu Service typu ClusterIP o nazwie backend-svc dla poda my-sql w przestrzeni nazw backend. Usługa będzie na porcie 3306.
+
+![alt text](images/image-9.png)
+
+
+
+
+### Aplikuję pliki usług. 
+
+![alt text](images/image-10.png)
+
+### Sprawdzam poprawność utworzenia.
+
+![alt text](images/image-19.png)
+
+
+### Zgodnie z rysunkiem należy ustawić polityki sieciowe dla podów frontend i mysql.
+
+### Tworzę plik YAML NetworkPolicy dla podów Deploymentu frontend w przestrzeni nazw frontend. Blok z portem UDP i TCP i portami 53 jest konieczny dla DNS czyli rozwiązywania nazw. W Egress, czyli ruchu wychodzącym, pozwalam na ruch wyłącznie do podów Deploymentu backend w przestrzeni nazw backend na port 80. Dla Ingress, czyli ruchu wchodzącego, zezwalam na ruch z Deploymentu backend z przestrzeni nazw backend. Wykorzystałem wcześniej utworzoną etykietę dla przestrzeni nazw backend – ns-name=backend.
+
+![alt text](images/image-11.png)
+
+
+
+
+### Tworzę drugi plik YAML NetworkPolicy dla poda my-sql w przestrzeni nazw backend. Pozwalam na ruch wchodzący Ingress tylko na port 3306 z podów Deploymentu backend z przestrzeni nazw backend (czyli tej samej, więc nie trzeba tego podawać). Wykorzystałem wcześniej utworzoną etykietę dla poda my-sql – app=mysql.
+
+![alt text](images/image-12.png)
+
+
+### Aplikuję pliki YAML polityk sieciowych.
+
+![alt text](images/image-13.png)
+
+
+### Weryfikuję poprawność utworzenia.
+
+![alt text](images/image-20.png)
+
+### Tworzę pliki YAML obiektów ResourceQuota, by ograniczyć liczbę podów i dostępne zasoby dla obydwu przestrzeni nazw. Zgodnie z poleceniem dla przestrzeni frontend ustawiam max. 10 podów, CPU=1 i pamięć RAM 1,5 GiB, a dla przestrzeni nazw backend max. 3 pody, CPU=1 i 1 GiB pamięci RAM.
+
+![alt text](images/image-14.png)
+
+![alt text](images/image-15.png)
+
+
+### Aplikuję pliki YAML obiektów ResourceQuota.
+
+![alt text](images/image-16.png)
+
+
+### Weryfikuję poprawność utworzenia obiektów.
+
+![alt text](images/image-21.png)
+
+
+### Dodaję dodatek serwer metryk potrzebyn do wykonania zadania. Tworzę plik YAML obiektu HorizontalPodAutoscaler dla Deploymentu frontend w przestrzeni nazw frontend. Ustawiam docelowe średnie użycie CPU na 50%, minimalną liczbę podów 3 i maksymalną liczbę podów 10. Dodaję do wygenerowane pliku pole określające przestrzeń nazw.
+
+![alt text](images/image-22.png)
+
+
+### Aplikuję plik obiektu. Sprawdzam poprawność utworzenia. Po chwili obiekt zebrał dane i działa.
+
+![alt text](images/image-23.png)
+
+
+
+
