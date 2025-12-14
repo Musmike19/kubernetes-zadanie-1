@@ -51,6 +51,11 @@
 ![alt text](images/image-18.png)
 
 
+### Weryfikuję, czy pody Deploymentu frontend są na innych węzłach niż pod my-sql i pod Deploymentu backend i czy te drugie pody są na jednym węźle. Jest poprawnie.
+
+![alt text](images/image-24.png)
+
+
 ### Tworzę plik obiektu Service typu NodePort o nazwie frontend-svc dla Deploymentu frontend w przestrzeni nazw frontend. Usługa będzie na porcie 80.
 
 ![alt text](images/image-7.png)
@@ -120,15 +125,29 @@
 ![alt text](images/image-21.png)
 
 
-### Dodaję dodatek serwer metryk potrzebyn do wykonania zadania. Tworzę plik YAML obiektu HorizontalPodAutoscaler dla Deploymentu frontend w przestrzeni nazw frontend. Ustawiam docelowe średnie użycie CPU na 50%, minimalną liczbę podów 3 i maksymalną liczbę podów 10. Dodaję do wygenerowane pliku pole określające przestrzeń nazw.
+### Dodaję dodatek serwer metryk potrzebyn do wykonania zadania. Tworzę plik YAML obiektu HorizontalPodAutoscaler dla Deploymentu frontend w przestrzeni nazw frontend. Ustawiam docelowe średnie użycie CPU na 2%, (by szybko przekroczyło tę wartość i zaczęło zwiększać repliki) minimalną liczbę podów 3 i maksymalną liczbę podów 10. Dodaję do wygenerowane pliku pole określające przestrzeń nazw frontend.
 
 ![alt text](images/image-22.png)
-
 
 ### Aplikuję plik obiektu. Sprawdzam poprawność utworzenia. Po chwili obiekt zebrał dane i działa.
 
 ![alt text](images/image-23.png)
 
+
+### Tworzę plik YAML poda generującego obciążenie. Tworzę w przestrzeni nazw backend pod load-generator z etykietą app=backend, co pozwala na komunikację z frontendem zgodnie z polityką sieciową. Wewnątrz kontenera uruchamiam cztery równoległe pętle zapytań do serwisu frontendowego, aby wygenerować wystarczające obciążenie CPU, aby HPA zadziałało. Ustawiam zasoby request i limits poda uwzględniając przy tym wymogi ResourceQuota przestrzeni nazw backend. Aplikuję plik obiektu. Pod działa.
+
+![alt text](images/image-25.png)
+
+![alt text](images/image-29.png)
+
+
+### Jak widać wartość średniego użycia CPU na 2% szybko została przekroczona i autoskaler zaczął powielać pody frontendu do maksymalnej wartości 10 podów. Po usunięciu poda generującego obciążenie zużycie CPU znowu spadło poniżej 2%, a po pewnym czasie liczba replik zmniejszyła się do minimalnej wartości 3 podów.  
+
+![alt text](images/image-26.png)
+
+![alt text](images/image-28.png)
+
+![alt text](images/image-27.png)
 
 
 
