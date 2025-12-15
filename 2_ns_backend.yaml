@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: backend
+  # Etykieta 'ns-name' pozwala NetworkPolicy w przestrzeni frontend
+  # na identyfikację i dopuszczenie ruchu przychodzącego z backendu.
+  labels:
+    ns-name: backend
+spec: {}
+status: {}

@@ -152,7 +152,7 @@
 
 
 ### Pytanie 1. 
-Czy możliwe jest dokonanie aktualizacji aplikacji frontend (np. wersji obrazu kontenera) gdy aplikacja jest pod kontrolą opracowanego autoskalera HPA? Proszę do odpowiedzi (TAK lub NIE) dodać link do fragmentu dokumentacji, w którym jest rozstrzygnięta ta kwestia?
+Czy możliwe jest dokonanie aktualizacji aplikacji frontend (np. wersji obrazu kontenera) gdy aplikacja jest pod kontrolą opracowanego autoskalera HPA? Proszę do odpowiedzi (TAK lub NIE) dodać link do fragmentu dokumentacji, w którym jest rozstrzygnięta ta kwestia.
 
 #### TAK. Jest to możliwe, ponieważ HPA zarządza jedynie liczbą replik (polem replicas w Deployment), natomiast kontroler Deploymentu zarządza procesem wymiany podów (rollingUpdate). W trakcie aktualizacji kontroler Deploymentu dba o to, aby suma replik w starym i nowym ReplicaSet odpowiadała liczbie wymaganej przez HPA.
 
