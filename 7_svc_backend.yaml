@@ -11,7 +11,7 @@ spec:
   - port: 80
     protocol: TCP
     targetPort: 80
-  # Etykieta selectora ustawiona na backend
+  # Etykieta selectora dotycząca backendu
   selector:
     app: backend
   # Typ ClusterIP usługi

@@ -8,7 +8,7 @@ metadata:
   name: my-sql
   namespace: backend
 spec:
-  # Node Affinity: Wymusza uruchomienie bazy na tym samym węźle co backend (zone=backend).
+  # Node Affinity: Wymusza uruchomienie bazy na tym samym węźle co pody Deploymentu backend (zone=backend).
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

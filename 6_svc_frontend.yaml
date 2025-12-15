@@ -11,7 +11,7 @@ spec:
   - port: 80
     protocol: TCP
     targetPort: 80
-  # Etykieta selectora ustawiona na frontend
+  # Etykieta selectora dotycząca frontendu
   selector:
     app: frontend
   # Typ NodePort usługi

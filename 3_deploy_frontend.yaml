@@ -19,7 +19,7 @@ spec:
       labels:
         app: frontend
     spec:
-      # Node Affinity: Zapewnia, że pody Deploymentu nie trafą na węzły dedykowane dla Deploymentu backend i poda my-sql.
+      # Node Affinity: Zapewnia, że pody Deploymentu nie trafą na węzły dedykowane dla podów Deploymentu backend i poda my-sql.
       # Operator NotIn wyklucza węzeł oznaczony jako zone=backend.
       affinity:
         nodeAffinity:

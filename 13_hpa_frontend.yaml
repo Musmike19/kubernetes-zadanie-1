@@ -2,7 +2,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: frontend
-  # Przestrzeń nazw frontend dla HPA frontend.
+  # Przestrzeń nazw frontend
   namespace: frontend
 spec:
   # Maksymalna liczba replik ograniczona do 10, zgodnie z limitem ResourceQuota.

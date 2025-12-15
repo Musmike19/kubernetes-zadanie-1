@@ -25,13 +25,13 @@
 
 
 
-#### Tworzę plik YAML obiektu Deployment o nazwie backend na bazie obrazu nginx z 1 repliką. Dodaję do pliku sekcję nodeAffnity, aby pody mogły znaleźć się na tym samym węźle co my-sql. Używam do tego etykiety zone=backend. Określam też minimalne (requests) i maksymalne (limits) zasoby CPU i pamięci, jakie kontener może użyć – 256 MiB i cpu=200m. Jest to konieczne z powodu dalszej konfiguracji ResourceQuota. Parametry zostały dobrane losowo, ale w zakresie ResourceQuota.
+#### Tworzę plik YAML obiektu Deployment o nazwie backend na bazie obrazu nginx z 1 repliką. Dodaję do pliku sekcję nodeAffnity, aby pody mogły znaleźć się na tym samym węźle co my-sql. Używam do tego etykiety zone=backend. Określam też minimalne (requests) i maksymalne (limits) zasoby CPU i pamięci, jakie kontener może użyć – 256 MiB i cpu=200m. Jest to konieczne z powodu dalszej konfiguracji ResourceQuota. Parametry zostały dobrane orientacyjnie, ale w zakresie ResourceQuota.
 
 ![alt text](images/image-4.png)
 
 
 
-#### Tworzę plik YAML poda o nazwie my-sql na bazie obrazu mysql ze zmienną środowiskową MYSQL_ROOT_PASSWORD=root z hasłem do bazy danych oraz etykietą app=my-sql, która przyda się później dla obiektu NetworkPolicy dotyczącego my-sql. Określam też minimalne (requests) i maksymalne (limits) zasoby CPU i pamięci, jakie kontener może użyć – 512 MiB i cpu=500m. Jest to konieczne z powodu dalszej konfiguracji ResourceQuota. Parametry zostały dobrane losowo, ale w zakresie ResourceQuota.
+#### Tworzę plik YAML poda o nazwie my-sql na bazie obrazu mysql ze zmienną środowiskową MYSQL_ROOT_PASSWORD=root z hasłem do bazy danych oraz etykietą app=my-sql, która przyda się później dla obiektu NetworkPolicy dotyczącego my-sql. Dodaję do pliku sekcję nodeAffnity, aby pod mógł znaleźć się na tym samym węźle co pod Deploymentu backend. Określam też minimalne (requests) i maksymalne (limits) zasoby CPU i pamięci, jakie kontener może użyć – 512 MiB i cpu=500m. Jest to konieczne z powodu dalszej konfiguracji ResourceQuota. Parametry zostały dobrane orientacyjnie, ale w zakresie ResourceQuota.
 
 ![alt text](images/image-5.png)
 
@@ -87,7 +87,7 @@
 
 #### Zgodnie z rysunkiem należy ustawić polityki sieciowe dla podów frontend i mysql.
 
-#### Tworzę plik YAML NetworkPolicy dla podów Deploymentu frontend w przestrzeni nazw frontend. Blok z portem UDP i TCP i portami 53 jest konieczny dla DNS czyli rozwiązywania nazw. W Egress, czyli ruchu wychodzącym, pozwalam na ruch wyłącznie do podów Deploymentu backend w przestrzeni nazw backend na port 80. Dla Ingress, czyli ruchu wchodzącego, zezwalam na ruch z Deploymentu backend z przestrzeni nazw backend. Wykorzystałem wcześniej utworzoną etykietę dla przestrzeni nazw backend – ns-name=backend.
+#### Tworzę plik YAML NetworkPolicy dla podów Deploymentu frontend w przestrzeni nazw frontend. Blok z portem UDP i TCP i portami 53 jest konieczny dla DNS czyli rozwiązywania nazw. W Egress, czyli ruchu wychodzącym, pozwalam na ruch wyłącznie do podów Deploymentu backend w przestrzeni nazw backend na port 80. Dla Ingress, czyli ruchu wchodzącego, zezwalam na ruch z podów Deploymentu backend z przestrzeni nazw backend. Wykorzystałem wcześniej utworzoną etykietę dla przestrzeni nazw backend – ns-name=backend.
 
 ![alt text](images/image-11.png)
 
@@ -125,7 +125,7 @@
 ![alt text](images/image-21.png)
 
 
-#### Dodaję dodatek serwer metryk potrzebyn do wykonania zadania. Tworzę plik YAML obiektu HorizontalPodAutoscaler dla Deploymentu frontend w przestrzeni nazw frontend. Ustawiam docelowe średnie użycie CPU na 2%, (by szybko przekroczyło tę wartość i zaczęło zwiększać repliki) minimalną liczbę podów 3 i maksymalną liczbę podów 10. Dodaję do wygenerowane pliku pole określające przestrzeń nazw frontend.
+#### Dodaję dodatek serwer metryk potrzebny do wykonania zadania. Tworzę plik YAML obiektu HorizontalPodAutoscaler dla Deploymentu frontend w przestrzeni nazw frontend. Ustawiam docelowe średnie użycie CPU na 2%, (by szybko przekroczyło tę wartość i zaczęło zwiększać repliki) minimalną liczbę podów 3 i maksymalną liczbę podów 10. Dodaję do wygenerowane pliku pole określające przestrzeń nazw frontend.
 
 ![alt text](images/image-22.png)
 
@@ -134,7 +134,7 @@
 ![alt text](images/image-23.png)
 
 
-#### Tworzę plik YAML poda generującego obciążenie. Tworzę w przestrzeni nazw backend pod load-generator z etykietą app=backend, co pozwala na komunikację z frontendem zgodnie z polityką sieciową. Wewnątrz kontenera uruchamiam cztery równoległe pętle zapytań do serwisu frontendowego, aby wygenerować wystarczające obciążenie CPU, aby HPA zadziałało. Ustawiam zasoby request i limits poda uwzględniając przy tym wymogi ResourceQuota przestrzeni nazw backend. Aplikuję plik obiektu. Pod działa.
+#### Tworzę plik YAML poda generującego obciążenie. Tworzę w przestrzeni nazw backend pod load-generator z etykietą app=backend, co pozwala na komunikację z frontendem zgodnie z polityką sieciową. Wewnątrz kontenera uruchamiam cztery równoległe pętle zapytań do serwisu frontendowego, aby wygenerować wystarczające obciążenie CPU, aby HPA zadziałało i powielało repliki. Używam pełnej nazwy DNS usługi ponieważ pod znajduje się w innej przestrzeni nazw – skrócona nazwa działa tylko w obrębie tej samej namespace. Ustawiam zasoby request i limits poda uwzględniając przy tym wymogi ResourceQuota przestrzeni nazw backend. Aplikuję plik obiektu. Pod działa.
 
 ![alt text](images/image-25.png)
 

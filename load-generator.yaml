@@ -16,6 +16,9 @@ spec:
     command:
       - /bin/sh
       - -c
+      # Użyta jest pełna nazwa DNS usługi
+      # ponieważ pod znajduje się w innej przestrzeni nazw – skrócona nazwa działa
+      # tylko w obrębie tej samej namespace.
       - |
         while true; do wget -q -O- http://frontend-svc.frontend.svc.cluster.local &>/dev/null; done &
         while true; do wget -q -O- http://frontend-svc.frontend.svc.cluster.local &>/dev/null; done &

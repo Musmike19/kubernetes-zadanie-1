@@ -2,14 +2,18 @@ apiVersion: v1
 kind: ResourceQuota
 metadata:
   name: frontend-quota
+  # Przestrzeń nazw, do której odnosi się limit zasobów
   namespace: frontend
 spec:
   hard:
-    # Łączne zasoby CPU i RAM dostępne dla wszystkich podów w tej przestrzeni.
+    # --- Łączne zasoby CPU i RAM dostępne dla wszystkich podów w tej przestrzeni ---
+    # Limit CPU i pamięci RAM dla wszystkich podów w przestrzeni frontend
     limits.cpu: "1"
     limits.memory: 1536Mi
-    # Maksymalna liczba podów w przestrzeni frontend
+    # Maksymalna liczba podów w przestrzeni frontend: 10
     pods: "10"
+    # Rezerwacje zasobów dla wszystkich podów w przestrzeni frontend
     requests.cpu: "1"   # 10 * 100m = 1000m = 1 CPU
     requests.memory: 1536Mi  # 1.5 GiB RAM
+    # ---
 status: {}

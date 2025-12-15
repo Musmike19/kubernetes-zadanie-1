@@ -35,7 +35,7 @@ spec:
 
   # --- Ingress (Ruch przychodzący) ---
   ingress:
-  # 1. Zezwolenie na połączenie przychodzące wyłącznie od podów Deploymentu backend w przestrzeni nazw backend
+  # 1. Zezwolenie na połączenie przychodzące od podów Deploymentu backend w przestrzeni nazw backend
   - from:
     - namespaceSelector:
         matchLabels:
