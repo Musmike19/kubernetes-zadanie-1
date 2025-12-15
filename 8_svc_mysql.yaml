@@ -7,11 +7,14 @@ metadata:
   namespace: backend
 spec:
   ports:
+  # Port usługi
   - port: 3306
     protocol: TCP
     targetPort: 3306
+  # Etykieta selectora ustawiona na my-sql
   selector:
     app: my-sql
+  # Typ ClusterIP usługi
   type: ClusterIP
 status:
   loadBalancer: {}

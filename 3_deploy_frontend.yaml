@@ -3,9 +3,12 @@ kind: Deployment
 metadata:
   labels:
     app: frontend
+  # Nazwa Deploymentu frontend.
   name: frontend
+  # Przestrzeń nazw frontend.
   namespace: frontend
 spec:
+  # Liczba replik Deploymentu frontend ustawiona na 3.
   replicas: 3
   selector:
     matchLabels:
@@ -16,6 +19,8 @@ spec:
       labels:
         app: frontend
     spec:
+      # Node Affinity: Zapewnia, że pody Deploymentu nie trafą na węzły dedykowane dla Deploymentu backend i poda my-sql.
+      # Operator NotIn wyklucza węzeł oznaczony jako zone=backend.
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -26,8 +31,11 @@ spec:
                 values:
                 - backend
       containers:
+      # Obraz nginx dla Deploymentu frontend.
       - image: nginx
         name: nginx
+        # Zasoby: Niezbędne do działania przy włączonym ResourceQuota.
+        # 100m CPU pozwala na uruchomienie dokładnie 10 replik w ramach limitu 1 CPU.
         resources:
           requests:
             cpu: 100m

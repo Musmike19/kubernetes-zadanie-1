@@ -3,9 +3,12 @@ kind: Deployment
 metadata:
   labels:
     app: backend
+  # Nazwa Deploymentu backend.
   name: backend
+  # Nazwa przestrzeni nazw backend.
   namespace: backend
 spec:
+  # Liczba replik Deploymentu backend ustawiona na 1.
   replicas: 1
   selector:
     matchLabels:
@@ -16,6 +19,8 @@ spec:
       labels:
         app: backend
     spec:
+      # Node Affinity: Wymusza uruchomienie podu Deploymentu backend na węźle oznaczonym etykietą zone=backend.
+      # Zapewnia to fizyczną separację od frontendu.
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -26,8 +31,11 @@ spec:
                 values:
                 - backend
       containers:
+      # Obraz nginx dla Deploymentu backend.
       - image: nginx
         name: nginx
+        # Zasoby: Niezbędne do działania przy włączonym ResourceQuota.
+        # Zasoby dopasowane do limitów Quota backendu (200m i 256Mi RAM zostawia miejsce dla poda my-sql i poda generującego obciążenie).
         resources:
           requests:
             cpu: 200m

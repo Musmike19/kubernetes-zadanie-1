@@ -7,11 +7,14 @@ metadata:
   namespace: backend
 spec:
   ports:
+  # Port usługi
   - port: 80
     protocol: TCP
     targetPort: 80
+  # Etykieta selectora ustawiona na backend
   selector:
     app: backend
+  # Typ ClusterIP usługi
   type: ClusterIP
 status:
   loadBalancer: {}

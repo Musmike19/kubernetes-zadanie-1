@@ -5,9 +5,11 @@ metadata:
   namespace: frontend
 spec:
   hard:
+    # Łączne zasoby CPU i RAM dostępne dla wszystkich podów w tej przestrzeni.
     limits.cpu: "1"
     limits.memory: 1536Mi
+    # Maksymalna liczba podów w przestrzeni frontend
     pods: "10"
-    requests.cpu: "1"
-    requests.memory: 1536Mi
+    requests.cpu: "1"   # 10 * 100m = 1000m = 1 CPU
+    requests.memory: 1536Mi  # 1.5 GiB RAM
 status: {}

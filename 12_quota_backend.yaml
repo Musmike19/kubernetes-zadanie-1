@@ -5,8 +5,10 @@ metadata:
   namespace: backend
 spec:
   hard:
+    # Łączne zasoby CPU i RAM dostępne dla wszystkich podów w tej przestrzeni.
     limits.cpu: "1"
     limits.memory: 1Gi
+    # Limit dla przestrzeni nazw backend: max 3 pody 
     pods: "3"
     requests.cpu: "1"
     requests.memory: 1Gi

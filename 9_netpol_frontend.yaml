@@ -4,18 +4,24 @@ metadata:
   name: frontend-policy
   namespace: frontend
 spec:
+  # Polityka dotyczy tylko podów z etykietą app=frontend
   podSelector:
     matchLabels:
       app: frontend
+  # Definiujemy reguły zarówno dla ruchu przychodzącego jak i wychodzącego
   policyTypes:
   - Ingress
   - Egress
+  
+  # --- Egress (Ruch wychodzący) ---
   egress:
+  # 1. Zezwolenie na ruch DNS (port 53 UDP/TCP) - niezbędne do rozwiązywania nazw usług
   - ports:
     - protocol: UDP
       port: 53
     - protocol: TCP
       port: 53
+  # 2. Zezwolenie na połączenie wyłącznie do backendu (namespace backend, pod backend) na port 80
   - to:
     - namespaceSelector:
         matchLabels:
@@ -26,7 +32,10 @@ spec:
     ports:
     - protocol: TCP
       port: 80
+
+  # --- Ingress (Ruch przychodzący) ---
   ingress:
+  # 1. Zezwolenie na połączenie przychodzące wyłącznie od podów Deploymentu backend w przestrzeni nazw backend
   - from:
     - namespaceSelector:
         matchLabels:
@@ -34,3 +43,5 @@ spec:
       podSelector:
         matchLabels:
           app: backend
+    # Brak specyfikacji portu oznacza, że dozwolony jest ruch na wszystkich portach,
+    # na których nasłuchuje frontend (np. 80).

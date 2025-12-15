@@ -7,11 +7,14 @@ metadata:
   namespace: frontend
 spec:
   ports:
+  # Port usługi
   - port: 80
     protocol: TCP
     targetPort: 80
+  # Etykieta selectora ustawiona na frontend
   selector:
     app: frontend
+  # Typ NodePort usługi
   type: NodePort
 status:
   loadBalancer: {}

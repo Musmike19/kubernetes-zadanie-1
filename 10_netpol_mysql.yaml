@@ -4,16 +4,21 @@ metadata:
   name: mysql-policy
   namespace: backend
 spec:
+  # Ochrona dotyczy poda bazy danych
   podSelector:
     matchLabels:
       app: my-sql
   policyTypes:
   - Ingress
+  
+  # --- Ingress (Ruch przychodzący) ---
   ingress:
+  # Zezwolenie na ruch tylko od podów Deploymentu backend (w tej samej przestrzeni nazw)
   - from:
     - podSelector:
         matchLabels:
           app: backend
+    # Ograniczenie tylko do portu bazy danych (3306)
     ports:
     - protocol: TCP
       port: 3306

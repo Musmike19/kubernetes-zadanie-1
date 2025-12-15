@@ -3,6 +3,7 @@ kind: Pod
 metadata:
   name: load-generator
   namespace: backend
+  # Etykieta 'app: backend' jest wymagana, aby NetworkPolicy frontendu dopuściła ruch z tego poda.
   labels:
     app: backend
 spec:
@@ -10,6 +11,8 @@ spec:
   containers:
   - name: load-generator
     image: busybox:1.28
+    # Uruchomienie 4 równoległych procesów wget w celu wygenerowania
+    # wystarczającego obciążenia CPU do wyzwolenia HPA.
     command:
       - /bin/sh
       - -c
@@ -19,6 +22,7 @@ spec:
         while true; do wget -q -O- http://frontend-svc.frontend.svc.cluster.local &>/dev/null; done &
         while true; do wget -q -O- http://frontend-svc.frontend.svc.cluster.local &>/dev/null; done &
         wait
+    # Zdefiniowanie resources jest wymagane przez ResourceQuota w przestrzeni nazw backend.
     resources:
       requests:
         cpu: 50m

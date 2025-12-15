@@ -2,17 +2,23 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: frontend
+  # Przestrzeń nazw frontend dla HPA frontend.
   namespace: frontend
 spec:
+  # Maksymalna liczba replik ograniczona do 10, zgodnie z limitem ResourceQuota.
   maxReplicas: 10
   metrics:
   - resource:
       name: cpu
       target:
+        # Niski próg utylizacji CPU (2%) ustawiony w celu demonstracji skalowania
+        # przy użyciu generatora obciążenia o ograniczonej wydajności.
         averageUtilization: 2
         type: Utilization
     type: Resource
+  # Minimalna liczba replik równa 3.
   minReplicas: 3
+  # Docelowa referencja skalowania do Deploymentu frontend.
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment

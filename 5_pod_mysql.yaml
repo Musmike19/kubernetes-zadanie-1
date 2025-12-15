@@ -1,11 +1,14 @@
 apiVersion: v1
 kind: Pod
 metadata:
+  # Etykieta poda my-sql potrzebna w NetworkPolicy.
   labels:
     app: my-sql
+  # Nazwa poda my-sql w przestrzeni backend.
   name: my-sql
   namespace: backend
 spec:
+  # Node Affinity: Wymusza uruchomienie bazy na tym samym węźle co backend (zone=backend).
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -19,8 +22,11 @@ spec:
   - env:
     - name: MYSQL_ROOT_PASSWORD
       value: root
+    # Obraz MySQL dla poda my-sql.
     image: mysql
     name: my-sql
+    # Zasoby dla poda my-sql, wymagane przez ResourceQuota w przestrzeni backend.
+    # Zasoby dopasowane do limitów Quota backendu (500m i 512Mi RAM zostawia miejsce dla poda Deploymentu backend i poda generującego obciążenie).
     resources:
       requests:
         cpu: 500m
